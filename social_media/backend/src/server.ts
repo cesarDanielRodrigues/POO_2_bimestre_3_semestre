@@ -23,7 +23,7 @@ app.listen({
     console.log('Http server running')
 })
 
-
+// ORM(prisma) - Object-Relational Mapping(Mapeamento Objeto-Relacional) é uma técnica para aproximar o paradigma de desenvolvimento de aplicações orientadas a objetos ao paradigma do banco de dados relacional.
 
 
 
