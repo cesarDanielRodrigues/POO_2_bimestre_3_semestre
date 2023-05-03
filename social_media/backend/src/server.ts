@@ -27,14 +27,14 @@ server.get('/test', () => {
 
 // rota para listar (consultar) os posts cadastrados no banco de dados
 // a função é assiscrona, isto é, quem a chamar, pode continuar sem que tenha  resposta
-server.get('/post', async () => {
+server.get('/posts', async () => {
     //await indica que a função somente continua depois que os dados vierem do BD 
     const posts = await prisma.post.findMany()
     return posts
 })
 
 
-server.get('/post/title/:title', async (request) => {
+server.get('/posts/title/:title', async (request) => {
     //define um objeto zod contando o esquema de dado
     const titleParam = z.object({
         title: z.string()
@@ -42,7 +42,7 @@ server.get('/post/title/:title', async (request) => {
     //recuperar o dado do frontend a partir do zod titleParam
     //request.params é para recuperar o dado da url
     //converte o texto enviando pelo frontend para a variavel teste
-    const {title} = titleParam.parse(request.params)
+    const { title } = titleParam.parse(request.params)
     const posts = await prisma.post.findMany({
         where: {
             title: {
@@ -53,8 +53,26 @@ server.get('/post/title/:title', async (request) => {
     return posts
 })
 //rota para a criação de um post - verbo post
-server.post('/post', async(Request) =>{
+server.post('/post', async (request) => {
+    //define um objeto zod contando o esquema de dado
+    const postBody = z.object({
+        title: z.string(),
+        content: z.string(),
+        published: z.boolean()
+    })
+    // reupera o dado do frontend a partir do zod postbody
+    // converte o texto enviado pelo frontend para as variaveis title, content, published
 
+    const { title, content, published } = postBody.parse(request.body)
+
+    const newPost = await prisma.post.create({
+        data: {
+            title: title,
+            content: content,
+            published: published
+        }
+    })
+    return newPost // retorna o novo post criado
 })
 
 //subir o servidor http e fica ouvindo na porta 3333
