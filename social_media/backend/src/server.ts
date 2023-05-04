@@ -4,7 +4,7 @@ import Fastify from "fastify";
 //instaciar um objeto da classe fastfy
 const server = Fastify()
 //importa a dependencia zod
-import { z } from "zod";
+import { number, z } from "zod";
 //importa dependencia prisma
 import { PrismaClient } from "@prisma/client";
 
@@ -24,7 +24,6 @@ server.get('/test', () => {
     return 'Teste de rota'
 })
 
-
 // rota para listar (consultar) os posts cadastrados no banco de dados
 // a função é assiscrona, isto é, quem a chamar, pode continuar sem que tenha  resposta
 server.get('/posts', async () => {
@@ -32,8 +31,6 @@ server.get('/posts', async () => {
     const posts = await prisma.post.findMany()
     return posts
 })
-
-
 server.get('/posts/title/:title', async (request) => {
     //define um objeto zod contando o esquema de dado
     const titleParam = z.object({
@@ -74,7 +71,62 @@ server.post('/post', async (request) => {
     })
     return newPost // retorna o novo post criado
 })
+//rota para atualizar o conteudo de um post
+server.patch('/post/content', async (Request) => {
+    //cria um objeto zod para definir um esquema de dados
+    const contentBody = z.object({
+        id: z.number(),
+        content: z.string()
+    })
+    //recupera os dados do frontend 
+    const { id, content } = contentBody.parse(Request.body)
+    //atualiza no banco de dados
+    const postUpdated = await prisma.post.update({
+        where: {
+            id: id
+        },
+        data: {
+            content: content
+        }
+    })
+    return postUpdated //retorna a atualização do post
+})
+// rota para publicar um artigo
+server.patch('/post/content/published', async (request) => {
+    //define um objeto zod contando o esquema de dado
+    const postBody = z.object({
+        title: z.string(),
+        content: z.string(),
+        published: z.boolean()
+    })
 
+    const { title, content, published } = postBody.parse(request.body)
+
+    const newPostUpdate = await prisma.post.create({
+        data: {
+            title: title,
+            content: content,
+            published: published
+        }
+    })
+    return newPostUpdate // retorna o novo post criado
+})
+//rota para deletar um post do banco de dados
+server.delete('/post/content/:id', async (request) => {
+    const postBody = z.object({
+        id: z.string()
+    })
+    // recura o id do frontend
+    const { id } = postBody.parse(request.params)
+
+    const idNumber = Number(id)
+    const postDeleted = await prisma.post.delete({
+        where:{
+            id:idNumber
+        }
+    })
+    return postDeleted
+})
 //subir o servidor http e fica ouvindo na porta 3333
 server.listen({
     port: 3333
