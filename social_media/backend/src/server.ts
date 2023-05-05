@@ -23,7 +23,6 @@ server.get('/hello', () => {
 server.get('/test', () => {
     return 'Teste de rota'
 })
-
 // rota para listar (consultar) os posts cadastrados no banco de dados
 // a função é assiscrona, isto é, quem a chamar, pode continuar sem que tenha  resposta
 server.get('/posts', async () => {
@@ -118,14 +117,14 @@ server.delete('/post/content/:id', async (request) => {
     })
     // recura o id do frontend
     const { id } = postBody.parse(request.params)
-
     const idNumber = Number(id)
+    //atualiza no banco de dados
     const postDeleted = await prisma.post.delete({
         where:{
             id:idNumber
         }
     })
-    return postDeleted
+    return postDeleted // retorna o post que foi apagado
 })
 //subir o servidor http e fica ouvindo na porta 3333
 server.listen({
