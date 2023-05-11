@@ -3,9 +3,13 @@
 import Fastify from "fastify";
 //importas as rotas
 import { AppRoutes } from "./routes";
+// importa a dependencia cors
+import cors from '@fastify/cors'
 //criar um objeto da classe fastfy
 const server = Fastify()
-//registra s notas
+//registra cors no server
+server.register(cors)
+//registra n rotas
 server.register(AppRoutes)
 //subir o servidor http e fica ouvindo na porta 3333
 server.listen({

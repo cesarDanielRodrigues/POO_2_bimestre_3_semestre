@@ -10,7 +10,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fastify/cors": "^8.2.1",
     "@prisma/client": "^4.13.0",
+    "cors": "^2.8.5",
     "fastify": "^4.15.0",
     "zod": "^3.21.4"
   },
