@@ -20,7 +20,7 @@ async function confirmar() {
     //recuperar os dados do formulario
     const title = document.getElementById('title').value
     const content = document.getElementById('content').value
-    const published = document.getElementById('sim').value
+    const published = document.getElementById('sim').checked
     // alert(published)
     const corpo = {title,content,published}
     //chama a api
@@ -30,6 +30,7 @@ async function confirmar() {
         headers: {
             "Content-Type": "application/json;charset=UTF-8"
         }
+        
     })
         .then(resposta => {
             alert("Operação realizada com sucesso")
@@ -38,6 +39,7 @@ async function confirmar() {
             alert("Operação Falhou")
         })
         //atuliza a tabela
+        console.log(corpo)
         consultaPosts()
 }
 
