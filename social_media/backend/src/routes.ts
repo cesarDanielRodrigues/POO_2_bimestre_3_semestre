@@ -145,4 +145,29 @@ export async function AppRoutes(server: FastifyInstance) {
         return (variavel.count >= 1) ? 'atualização com sucesso' : 'nada foi alterado'
 
     })
+    server.put('/post/', async (Request) => {
+
+        // objeto zod para o corpo da requisição
+        const putBody = z.object({
+            "id":z.number(),
+            "title": z.string(),
+            "content": z.string(),
+            "published": z.boolean()
+        })
+        // recupera os dados do frontend
+        const { id,title, content,published } = putBody.parse(Request.body)
+        const resposta = await prisma.post.updateMany({
+            where: {
+                id: Number(id),
+                
+            },
+            data: {
+                title,
+                content,
+                published
+            }
+        })
+        return (resposta.count >= 1) ? 'atualização com sucesso' : 'nada foi alterado'
+
+    })
 }
