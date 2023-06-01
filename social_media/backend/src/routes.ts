@@ -7,13 +7,13 @@ import { prisma } from './lib/prisma'
 
 export async function AppRoutes(server: FastifyInstance) {
     // criar uma rota de api com o verbo get - consulta
-    server.get('/hello', () => {
-        return 'Hello world, good night'
-    })
+    // server.get('/hello', () => {
+    //     return 'Hello world, good night'
+    // })
     //Rota nova
-    server.get('/test', () => {
-        return 'Teste de rota'
-    })
+    // server.get('/test', () => {
+    //     return 'Teste de rota'
+    // })
     // rota para listar (consultar) os posts cadastrados no banco de dados
     // a função é assiscrona, isto é, quem a chamar, pode continuar sem que tenha  resposta
     server.get('/posts', async () => {
@@ -45,18 +45,20 @@ export async function AppRoutes(server: FastifyInstance) {
         const postBody = z.object({
             title: z.string(),
             content: z.string(),
-            published: z.boolean()
+            published: z.boolean(),
+            userId: z.number()
         })
         // recupera o dado do frontend a partir do zod postbody
         // converte o texto enviado pelo frontend para as variaveis title, content, published
 
-        const { title, content, published } = postBody.parse(request.body)
+        const { title, content, published, userId } = postBody.parse(request.body)
 
         const newPost = await prisma.post.create({
             data: {
-                title: title,
-                content: content,
-                published: published
+                title,
+                content,
+                published,
+                userId
             }
         })
         return newPost // retorna o novo post criado
@@ -145,29 +147,71 @@ export async function AppRoutes(server: FastifyInstance) {
         return (variavel.count >= 1) ? 'atualização com sucesso' : 'nada foi alterado'
 
     })
+    //rota certa para atualizar um post
     server.put('/post/', async (Request) => {
 
         // objeto zod para o corpo da requisição
         const putBody = z.object({
-            "id":z.number(),
+            "id": z.number(),
             "title": z.string(),
             "content": z.string(),
             "published": z.boolean()
         })
         // recupera os dados do frontend
-        const { id,title, content,published } = putBody.parse(Request.body)
+        const { id, title, content, published } = putBody.parse(Request.body)
         const resposta = await prisma.post.updateMany({
             where: {
                 id: Number(id),
-                
+
             },
             data: {
                 title,
                 content,
-                published
+                published: Boolean(published)
             }
         })
         return (resposta.count >= 1) ? 'atualização com sucesso' : 'nada foi alterado'
 
+    })
+
+    //rota para criar user
+    server.post('/user', async (request) => {
+        const userBody = z.object({
+            username: z.string(),
+            password: z.string(),
+            email: z.string()
+        })
+
+        let { username, password, email } = userBody.parse(request.body)
+
+        const newUser = await prisma.user.create({
+            data: {
+                username,
+                password,
+                email
+            }
+        })
+        return newUser
+    })
+    //rota que consulta os usuarios
+    server.get('/users', async () => {
+        const users = await prisma.user.findMany()
+        return users
+    })
+    server.get('/posts/user/:userId', async (request) => {
+        //define um objeto zod contando o esquema de dado
+        const userIdParam = z.object({
+            userId: z.string()
+        })
+        //recuperar o dado do frontend a partir do zod titleParam
+        //request.params é para recuperar o dado da url
+        //converte o texto enviando pelo frontend para a variavel teste
+        const { userId } = userIdParam.parse(request.params)
+        const posts = await prisma.post.findMany({
+            where: {
+                userId: Number(userId)
+            }
+        })
+        return posts
     })
 }
