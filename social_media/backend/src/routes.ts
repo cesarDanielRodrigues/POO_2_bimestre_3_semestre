@@ -173,7 +173,6 @@ export async function AppRoutes(server: FastifyInstance) {
         return (resposta.count >= 1) ? 'atualização com sucesso' : 'nada foi alterado'
 
     })
-
     //rota para criar user
     server.post('/user', async (request) => {
         const userBody = z.object({
